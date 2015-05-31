@@ -4,10 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -80,14 +84,14 @@ public class QuizCardBuilder {
 		frame.setSize(500, 600);
 		frame.setVisible(true);
 		
-		
 	}
 	
 	private class NextCardListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 			//add the current card to the list and clear the text areas
-			
+			QuizCard card = new QuizCard(question.getText(), answer.getText());
+			cardList.add(card);
 		}
 		
 	}
@@ -97,6 +101,13 @@ public class QuizCardBuilder {
 		public void actionPerformed(ActionEvent e) {
 			// bring up a file dialog box
 			//let the user name and save the set
+			QuizCard card = new QuizCard(question.getText(), answer.getText());
+			cardList.add(card);
+			
+			//brings up a file dialog box
+			JFileChooser fileSave = new JFileChooser();
+			fileSave.showSaveDialog(frame);
+			saveFile(fileSave.getSelectedFile());
 			
 		}
 		
@@ -105,13 +116,32 @@ public class QuizCardBuilder {
 	private void saveFile(File file) {
 		//iterate through the list of cards, and write each one out to a text file
 		//in a parseable way
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			
+			for (QuizCard card : cardList) {
+				writer.write(card.getQuestion() + "/");
+				writer.write(card.getAnswer() + "\n");
+			}
+			writer.close();
+		} catch (IOException ex) {
+			System.out.println("couldn't write the cardList out");
+			ex.printStackTrace();
+		}
 	}
 	
 	
 	private class NewMenuListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			//clear out the card list, and clear out the text areas
+			cardList.clear();
+			clearCard();
 		}
+	}
+	private void clearCard() {
+		question.setText("");
+		answer.setText("");
+		question.requestFocus();
 	}
 	
 	
